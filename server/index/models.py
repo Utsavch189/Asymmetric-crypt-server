@@ -25,6 +25,7 @@ class Action(models.Model):
     filename=models.CharField(max_length=50,null=True,blank=True)
     system_name=models.CharField(max_length=50,null=True,blank=True)
     action_name=models.CharField(max_length=50,null=True,blank=True)
+    deactive_action=models.BooleanField(default=False)
     
     def __str__(self) -> str:
         return self.system_name

